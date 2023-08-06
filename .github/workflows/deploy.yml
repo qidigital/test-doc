@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main  # Change to your main branch if different
+      - master  # Change to your main branch if different
 
 jobs:
   build-deploy:
@@ -23,6 +23,7 @@ jobs:
 
       - name: Build website
         run: npm run build
+        working-directory: ./test-doc
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
