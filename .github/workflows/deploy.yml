@@ -1,33 +1,38 @@
-name: Deploy to GitHub Pages
+name: deploy-docusaurus
 
 on:
   push:
-    branches:
-      - master  # Change to your main branch if different
+    branches: [master]
+  pull_request:
+    branches: [master]
 
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  build-deploy:
+  publish:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Check out repo
         uses: actions/checkout@v2
-
-      - name: Set up Node.js
+      # Node is required for npm
+      - name: Set up Node
         uses: actions/setup-node@v2
         with:
-          node-version: 14  # Use the version compatible with your Docusaurus project
-          working-directory: ./test-doc
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build website
-        run: npm run build
-        working-directory: ./test-doc
-
+          node-version: "12"
+      # Install and build Docusaurus website
+      - name: Build Docusaurus website
+        run: |
+          cd website
+          npm install 
+          npm run build
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        if: success()
+        uses: crazy-max/ghaction-github-pages@v2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
+          target_branch: gh-pages
+          build_dir: website/build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
